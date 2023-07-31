@@ -5,6 +5,8 @@ functions-civo
 
 Filters out tweets and retweets for Civo's social media / marketing team.
 
-### Filter out a term
+### Filter out an additional term
 
-Edit [here](https://github.com/civo/openfaas-functions/blob/master/filter-tweet/handler.go#L28)
+Edit [handler.go](https://github.com/openfaas/functions-civo/blob/master/filter-tweet/handler.go)
+
+This function runs on [faasd](https://github.com/openfaas/faasd)
