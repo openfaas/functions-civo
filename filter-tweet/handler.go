@@ -19,10 +19,8 @@ func Handle(req []byte) string {
 
 	currentTweet := tweet{}
 
-	unmarshalErr := json.Unmarshal(req, &currentTweet)
-
-	if unmarshalErr != nil {
-		return fmt.Sprintf("Unable to unmarshal event: %s\n", unmarshalErr.Error())
+	if err := json.Unmarshal(req, &currentTweet); err != nil {
+		return fmt.Sprintf("Unable to unmarshal event: %s\n", err.Error())
 	}
 
 	if strings.Contains(currentTweet.Text, "RT") || strings.Contains(currentTweet.Username, os.Getenv("username")) {
@@ -33,18 +31,19 @@ func Handle(req []byte) string {
 		return fmt.Sprintf("Filtered out own tweet from %s\n", currentTweet.Username)
 	}
 
-	slackURL := readSecret("incoming-webhook-url")
+	slackURL := readSecret("civo-slack-incoming-webhook-url")
 
 	slackMsg := slackMessage{
-		Text:     "@" + currentTweet.Username + ": " + currentTweet.Text + " (via " + currentTweet.Link + ")",
-		Username: "@" + currentTweet.Username,
+		Text:     fmt.Sprintf("@%s: %s (via %s)", currentTweet.Username, currentTweet.Text, currentTweet.Link),
+		Username: fmt.Sprintf("@ %s", currentTweet.Username),
 	}
 
 	bodyBytes, _ := json.Marshal(slackMsg)
 	httpReq, _ := http.NewRequest(http.MethodPost, slackURL, bytes.NewReader(bodyBytes))
-	res, resErr := http.DefaultClient.Do(httpReq)
-	if resErr != nil {
-		fmt.Fprintf(os.Stderr, "resErr: %s\n", resErr)
+
+	res, err := http.DefaultClient.Do(httpReq)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "resErr: %s\n", err)
 		os.Exit(1)
 	}
 

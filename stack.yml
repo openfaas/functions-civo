@@ -4,12 +4,12 @@ provider:
   gateway: http://127.0.0.1:8080
 
 functions:
-  filter-tweet:
+  civo-filter-tweet:
     lang: go
     handler: ./filter-tweet
-    image: filter-tweet:latest
+    image: alexellis2/civo-filter-tweet:0.2.0
     secrets:
-    - slack-incoming-webhook-url
+    - civo-slack-incoming-webhook-url
     environment:
       username: "CivoCloud"
       read_debug: "true"
